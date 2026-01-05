@@ -1,5 +1,5 @@
 # Start from official Golang base image
-FROM golang:1.23-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 # Install build dependencies (needed for CGO/SQLite if we use CGO, but pure Go sqlite driver is better strictly. 
 # gorm/sqlite uses mattn/go-sqlite3 which REQUIRES CGO enabled and gcc)
