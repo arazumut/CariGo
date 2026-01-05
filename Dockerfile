@@ -28,6 +28,7 @@ RUN apk --no-cache add ca-certificates
 
 # Copy from builder
 COPY --from=builder /app/carigo-api .
+COPY --from=builder /app/web ./web
 
 # Render expects PORT env, but we'll default to 8080
 ENV PORT=8080
