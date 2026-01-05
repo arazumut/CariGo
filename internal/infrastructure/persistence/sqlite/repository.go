@@ -1,3 +1,5 @@
+package sqlite
+
 import (
 	"carigo/internal/application/ports"
 	"carigo/internal/domain"

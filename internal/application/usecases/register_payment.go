@@ -6,7 +6,6 @@ import (
 	"carigo/internal/domain"
 	"context"
 	"fmt"
-	"time"
 )
 
 // RegisterPaymentUseCase handles receiving money and allocating it to open invoices.
