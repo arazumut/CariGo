@@ -32,9 +32,11 @@ func main() {
 
 	// 3. Application (UseCases)
 	registerPaymentUC := usecases.NewRegisterPaymentUseCase(payRepo, invRepo, allocRepo, baseRepo, realClock)
+	createInvoiceUC := usecases.NewCreateInvoiceUseCase(invRepo, realClock)
 
 	// 4. Interfaces (HTTP)
 	paymentHandler := handlers.NewPaymentHandler(registerPaymentUC)
+	invoiceHandler := handlers.NewInvoiceHandler(createInvoiceUC)
 
 	r := gin.Default()
 
@@ -46,6 +48,7 @@ func main() {
 	// API Routes
 	api := r.Group("/api/v1")
 	{
+		api.POST("/invoices", invoiceHandler.CreateInvoice)
 		api.POST("/payments", paymentHandler.RegisterPayment)
 	}
 
