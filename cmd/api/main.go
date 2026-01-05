@@ -37,13 +37,23 @@ func main() {
 	// 4. Interfaces (HTTP)
 	paymentHandler := handlers.NewPaymentHandler(registerPaymentUC)
 	invoiceHandler := handlers.NewInvoiceHandler(createInvoiceUC)
+	dashboardHandler := handlers.NewDashboardHandler()
 
 	r := gin.Default()
+
+	// Static Files & Templates
+	r.Static("/assets", "./web/assets")
+	r.LoadHTMLGlob("web/templates/*.html")
+
+	// Helper for checking active page in template (if needed, mostly passed via gin.H)
 
 	// Initial Health Check
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "UP", "version": "MVP+"})
 	})
+
+	// UI Routes
+	r.GET("/", dashboardHandler.ShowDashboard)
 
 	// API Routes
 	api := r.Group("/api/v1")
