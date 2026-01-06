@@ -13,21 +13,70 @@
 </div>
 
 <div class="row clearfix row-deck">
+    <!-- 1. Toplam Ciro -->
     <div class="col-lg-3 col-md-6 col-sm-6">
         <div class="card number-chart">
             <div class="body">
-                <span class="text-uppercase">Açık Faturalar</span>
-                <h4 class="mb-0 mt-2">{{ .Stats.OpenInvoices }} <i class="fa fa-level-up font-12"></i></h4>
-                <small class="text-muted">Bekleyen tahsilatlar</small>
+                <span class="text-uppercase">Toplam Ciro</span>
+                <h4 class="mb-0 mt-2 text-primary">{{ .Stats.TotalRevenue }} ₺</h4>
+                <small class="text-muted">Kesilen tüm faturalar</small>
             </div>
         </div>
     </div>
+
+    <!-- 2. Toplam Tahsilat -->
     <div class="col-lg-3 col-md-6 col-sm-6">
         <div class="card number-chart">
             <div class="body">
                 <span class="text-uppercase">Toplam Tahsilat</span>
-                <h4 class="mb-0 mt-2">{{ .Stats.TotalCollected }} ₺</h4>
-                <small class="text-muted">Tüm zamanlar</small>
+                <h4 class="mb-0 mt-2 text-success">{{ .Stats.TotalCollected }} ₺</h4>
+                <small class="text-muted">Kasa girişi</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Bekleyen Alacak -->
+    <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card number-chart">
+            <div class="body">
+                <span class="text-uppercase">Bekleyen Alacak</span>
+                <h4 class="mb-0 mt-2 text-danger">{{ .Stats.PendingBalance }} ₺</h4>
+                <small class="text-muted">Piyasadan toplanacak</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Müşteri & Açık Fatura -->
+    <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card number-chart">
+            <div class="body">
+                <span class="text-uppercase">Aktif Durum</span>
+                <h4 class="mb-0 mt-2">{{ .Stats.TotalCustomers }} <small class="text-muted">Müşteri</small></h4>
+                <small class="text-muted">{{ .Stats.OpenInvoices }} adet açık fatura</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions Row -->
+<div class="row clearfix">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <a href="/invoices" class="btn btn-lg btn-outline-primary btn-block"><i
+                                class="fa fa-file-text"></i> Yeni Fatura Kes</a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="/payments" class="btn btn-lg btn-outline-success btn-block"><i
+                                class="fa fa-credit-card"></i> Tahsilat Gir</a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="/customers" class="btn btn-lg btn-outline-info btn-block"><i class="fa fa-users"></i>
+                            Müşteri Ekle</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

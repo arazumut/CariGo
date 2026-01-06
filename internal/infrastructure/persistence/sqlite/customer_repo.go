@@ -65,4 +65,10 @@ func (a *CustomerAdapter) FindAll(ctx context.Context) ([]*domain.Customer, erro
 	return customers, nil
 }
 
+func (a *CustomerAdapter) Count(ctx context.Context) (int64, error) {
+	var count int64
+	err := a.repo.getDB(ctx).Model(&CustomerModel{}).Count(&count).Error
+	return count, err
+}
+
 var _ ports.CustomerRepository = &CustomerAdapter{}

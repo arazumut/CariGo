@@ -28,7 +28,10 @@ func (h *DashboardHandler) ShowDashboard(c *gin.Context) {
 	// Helper to format cents to currency string (very basic)
     // In template or here. Let's send raw cents and let template logic or simple division handle it if possible.
 	// Or format here.
+	// Or format here.
 	formattedTotal := float64(stats.TotalCollected) / 100.0
+	formattedRevenue := float64(stats.TotalRevenue) / 100.0
+	formattedPending := float64(stats.PendingBalance) / 100.0
 
 	c.HTML(http.StatusOK, "dashboard.html", gin.H{
 		"Title":      "Dashboard",
@@ -36,6 +39,9 @@ func (h *DashboardHandler) ShowDashboard(c *gin.Context) {
 		"Stats": map[string]interface{}{
 			"TotalCollected": formattedTotal,
 			"OpenInvoices":   stats.OpenInvoices,
+			"TotalRevenue":   formattedRevenue,
+			"TotalCustomers": stats.TotalCustomers,
+			"PendingBalance": formattedPending,
 		},
 	})
 }

@@ -35,7 +35,7 @@ func main() {
 	createInvoiceUC := usecases.NewCreateInvoiceUseCase(invRepo, realClock)
 	listInvoicesUC := usecases.NewListInvoicesUseCase(invRepo)
 	listPaymentsUC := usecases.NewListPaymentsUseCase(payRepo)
-	dashboardStatsUC := usecases.NewGetDashboardStatsUseCase(payRepo, invRepo)
+	dashboardStatsUC := usecases.NewGetDashboardStatsUseCase(payRepo, invRepo, custRepo)
 	
 	// Customer UseCases
 	createCustomerUC := usecases.NewCreateCustomerUseCase(custRepo)

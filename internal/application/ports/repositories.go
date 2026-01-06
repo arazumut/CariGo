@@ -14,6 +14,7 @@ type InvoiceRepository interface {
 	FindAll(ctx context.Context) ([]*domain.Invoice, error)
 	FindByCustomer(ctx context.Context, customerID domain.CustomerID) ([]*domain.Invoice, error)
 	CountAllOpen(ctx context.Context) (int64, error)
+	SumTotalAmount(ctx context.Context) (int64, error)
 }
 
 // PaymentRepository defines access to Payment storage.
@@ -30,6 +31,7 @@ type CustomerRepository interface {
 	Save(ctx context.Context, customer *domain.Customer) error
 	FindByID(ctx context.Context, id domain.CustomerID) (*domain.Customer, error)
 	FindAll(ctx context.Context) ([]*domain.Customer, error)
+	Count(ctx context.Context) (int64, error)
 }
 
 // AllocationRepository defines access to Allocation storage.

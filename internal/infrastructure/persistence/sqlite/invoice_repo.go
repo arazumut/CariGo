@@ -134,4 +134,12 @@ func (a *InvoiceAdapter) CountAllOpen(ctx context.Context) (int64, error) {
 	return count, err
 }
 
+func (a *InvoiceAdapter) SumTotalAmount(ctx context.Context) (int64, error) {
+	var total int64
+	err := a.repo.getDB(ctx).Model(&InvoiceModel{}).
+		Select("ifnull(sum(total_amount), 0)").
+		Scan(&total).Error
+	return total, err
+}
+
 var _ ports.InvoiceRepository = &InvoiceAdapter{}
