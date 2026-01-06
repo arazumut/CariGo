@@ -1,3 +1,4 @@
+{{ define "header.html" }}
 <!doctype html>
 <html lang="en">
 
@@ -6,22 +7,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
-
     <!-- VENDOR CSS -->
     <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/vendor/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="/assets/vendor/toastr/toastr.min.css">
     <link rel="stylesheet" href="/assets/vendor/charts-c3/plugin.css" />
-
     <!-- MAIN Project CSS file -->
     <link rel="stylesheet" href="/assets/css/main.css">
 </head>
 
 <body data-theme="light" class="font-nunito">
     <div id="wrapper" class="theme-cyan">
-
-
-
         <!-- Top navbar -->
         <nav class="navbar navbar-fixed-top">
             <div class="container-fluid">
@@ -30,19 +26,15 @@
                     <button type="button" class="btn-toggle-fullwidth"><i class="fa fa-bars"></i></button>
                     <a href="/">CARIGO</a>
                 </div>
-
                 <div class="navbar-right">
                     <div id="navbar-menu">
                         <ul class="nav navbar-nav">
-                            <li>
-                                <a href="#" class="icon-menu"><i class="fa fa-power-off"></i></a>
-                            </li>
+                            <li><a href="#" class="icon-menu"><i class="fa fa-power-off"></i></a></li>
                         </ul>
                     </div>
                 </div>
             </div>
         </nav>
-
         <!-- Sidebar -->
         <div id="left-sidebar" class="sidebar">
             <div class="sidebar-scroll">
@@ -54,7 +46,6 @@
                             data-toggle="dropdown"><strong>Admin</strong></a>
                     </div>
                 </div>
-
                 <nav id="left-sidebar-nav" class="sidebar-nav">
                     <ul id="main-menu" class="metismenu">
                         <li class="{{ if eq .ActivePage " dashboard" }}active{{ end }}">
@@ -70,20 +61,7 @@
                 </nav>
             </div>
         </div>
-
         <!-- Main Content -->
         <div id="main-content">
             <div class="container-fluid">
-                {{ template "content" . }}
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Javascript -->
-    <script src="/assets/bundles/libscripts.bundle.js"></script>
-    <script src="/assets/bundles/vendorscripts.bundle.js"></script>
-    <script src="/assets/bundles/mainscripts.bundle.js"></script>
-</body>
-
-</html>
+                {{ end }}

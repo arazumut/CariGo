@@ -33,17 +33,18 @@ func main() {
 	// 3. Application (UseCases)
 	registerPaymentUC := usecases.NewRegisterPaymentUseCase(payRepo, invRepo, allocRepo, baseRepo, realClock)
 	createInvoiceUC := usecases.NewCreateInvoiceUseCase(invRepo, realClock)
+	dashboardStatsUC := usecases.NewGetDashboardStatsUseCase(payRepo, invRepo)
 
 	// 4. Interfaces (HTTP)
 	paymentHandler := handlers.NewPaymentHandler(registerPaymentUC)
 	invoiceHandler := handlers.NewInvoiceHandler(createInvoiceUC)
-	dashboardHandler := handlers.NewDashboardHandler()
+	dashboardHandler := handlers.NewDashboardHandler(dashboardStatsUC)
 
 	r := gin.Default()
 
 	// Static Files & Templates
 	r.Static("/assets", "./web/assets")
-	r.LoadHTMLGlob("web/templates/*.html")
+	r.LoadHTMLGlob("web/templates/**/*")
 
 	// Helper for checking active page in template (if needed, mostly passed via gin.H)
 

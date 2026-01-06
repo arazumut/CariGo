@@ -11,12 +11,14 @@ type InvoiceRepository interface {
 	FindByID(ctx context.Context, id domain.InvoiceID) (*domain.Invoice, error)
 	// FindOpenByCustomer returns all non-PAID/VOID invoices for a customer, typically ordered by DueDate (FIFO).
 	FindOpenByCustomer(ctx context.Context, customerID domain.CustomerID) ([]*domain.Invoice, error)
+	CountAllOpen(ctx context.Context) (int64, error)
 }
 
 // PaymentRepository defines access to Payment storage.
 type PaymentRepository interface {
 	Save(ctx context.Context, payment *domain.Payment) error
 	FindByID(ctx context.Context, id domain.PaymentID) (*domain.Payment, error)
+	SumTotalCollected(ctx context.Context) (int64, error)
 }
 
 // CustomerRepository defines access to Customer storage.

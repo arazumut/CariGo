@@ -1,10 +1,11 @@
-{{ define "content" }}
+{{ template "header.html" . }}
+
 <div class="block-header">
     <div class="row">
         <div class="col-lg-6 col-md-6 col-sm-12">
             <h2>Dashboard</h2>
             <ul class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/"><i class="fa fa-dashboard"></i></a></li>                            
+                <li class="breadcrumb-item"><a href="/"><i class="fa fa-dashboard"></i></a></li>
                 <li class="breadcrumb-item active">Genel Bakış</li>
             </ul>
         </div>
@@ -16,7 +17,7 @@
         <div class="card number-chart">
             <div class="body">
                 <span class="text-uppercase">Açık Faturalar</span>
-                <h4 class="mb-0 mt-2">12 <i class="fa fa-level-up font-12"></i></h4>
+                <h4 class="mb-0 mt-2">{{ .Stats.OpenInvoices }} <i class="fa fa-level-up font-12"></i></h4>
                 <small class="text-muted">Bekleyen tahsilatlar</small>
             </div>
         </div>
@@ -25,10 +26,11 @@
         <div class="card number-chart">
             <div class="body">
                 <span class="text-uppercase">Toplam Tahsilat</span>
-                <h4 class="mb-0 mt-2">54,000 ₺</h4>
-                <small class="text-muted">Bu ay</small>
+                <h4 class="mb-0 mt-2">{{ .Stats.TotalCollected }} ₺</h4>
+                <small class="text-muted">Tüm zamanlar</small>
             </div>
         </div>
     </div>
 </div>
-{{ end }}
+
+{{ template "footer.html" . }}

@@ -232,10 +232,25 @@ type InvoiceAdapter struct{ repo *GormRepository }
 func (a *InvoiceAdapter) Save(ctx context.Context, i *domain.Invoice) error { return a.repo.SaveInvoice(ctx, i) }
 func (a *InvoiceAdapter) FindByID(ctx context.Context, id domain.InvoiceID) (*domain.Invoice, error) { return nil, errors.New("not implemented") } // Not needed for current UseCase
 func (a *InvoiceAdapter) FindOpenByCustomer(ctx context.Context, cid domain.CustomerID) ([]*domain.Invoice, error) { return a.repo.FindOpenByCustomer(ctx, cid) }
+func (a *InvoiceAdapter) CountAllOpen(ctx context.Context) (int64, error) {
+	var count int64
+	err := a.repo.getDB(ctx).Model(&InvoiceModel{}).
+		Where("status IN ?", []string{string(domain.InvoiceStatusOpen), string(domain.InvoiceStatusPartial)}).
+		Count(&count).Error
+	return count, err
+}
 
 type PaymentAdapter struct{ repo *GormRepository }
 func (a *PaymentAdapter) Save(ctx context.Context, p *domain.Payment) error { return a.repo.SavePayment(ctx, p) }
 func (a *PaymentAdapter) FindByID(ctx context.Context, id domain.PaymentID) (*domain.Payment, error) { return nil, errors.New("not implemented") }
+func (a *PaymentAdapter) SumTotalCollected(ctx context.Context) (int64, error) {
+	var total int64
+	// Sum the initial amounts of all payments
+	err := a.repo.getDB(ctx).Model(&PaymentModel{}).
+		Select("ifnull(sum(amount), 0)").
+		Scan(&total).Error
+	return total, err
+}
 
 type AllocationAdapter struct{ repo *GormRepository }
 func (a *AllocationAdapter) Save(ctx context.Context, al *domain.Allocation) error { return a.repo.SaveAllocation(ctx, al) }
