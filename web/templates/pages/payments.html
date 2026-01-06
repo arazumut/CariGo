@@ -1,0 +1,146 @@
+{{ template "header.html" . }}
+
+<div class="block-header">
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <h2>Ödemeler</h2>
+            <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/"><i class="fa fa-dashboard"></i></a></li>
+                <li class="breadcrumb-item active">Ödemeler</li>
+            </ul>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <div class="d-flex flex-row-reverse">
+                <div class="page_action">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addPaymentModal"><i
+                            class="fa fa-plus"></i> Tahsilat Gir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row clearfix">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="header">
+                <h2>Tahsilat Geçmişi</h2>
+            </div>
+            <div class="body">
+                <div class="table-responsive">
+                    <table class="table table-hover js-basic-example dataTable table-custom">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Ödeme ID</th>
+                                <th>Müşteri ID</th>
+                                <th>Tutar</th>
+                                <th>Kalan Bakiye</th>
+                                <th>Tarih</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{ range .Payments }}
+                            <tr>
+                                <td>{{ .ID }}</td>
+                                <td>{{ .CustomerID }}</td>
+                                <td><span class="text-success">+{{ .Amount }} {{ .Currency }}</span></td>
+                                <td>{{ .AvailableAmount }} {{ .Currency }}</td>
+                                <td>{{ .Date }}</td>
+                            </tr>
+                            {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Payment Modal -->
+<div class="modal fade" id="addPaymentModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="title" id="defaultModalLabel">Yeni Tahsilat Gir</h4>
+            </div>
+            <div class="modal-body">
+                <form id="createPaymentForm">
+                    <div class="form-group">
+                        <label>Müşteri ID</label>
+                        <input type="text" class="form-control" name="customer_id" required value="CUST-001">
+                        <small class="form-text text-muted">Hangi müşteriden para aldık?</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Tutar (Tam Sayı Kuruş)</label>
+                        <input type="number" class="form-control" name="amount" required
+                            placeholder="örn: 5000 (50.00 TL)">
+                    </div>
+                    <div class="form-group">
+                        <label>Para Birimi</label>
+                        <select class="form-control" name="currency">
+                            <option value="TRY">TRY</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tarih</label>
+                        <input type="date" class="form-control" name="date" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="submitPayment()">Kaydet & Eşleştir</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function submitPayment() {
+        const form = document.getElementById('createPaymentForm');
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+            if (key === 'amount') {
+                data[key] = parseInt(value);
+            } else if (key === 'date') {
+                data[key] = new Date(value).toISOString();
+            } else {
+                data[key] = value;
+            }
+        });
+
+        fetch('/api/v1/payments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error) });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Build success message
+                let msg = 'Ödeme Alındı: ' + data.allocated_amount + ' kuruş faturalara dağıtıldı.\n';
+                if (data.allocated_invoices && data.allocated_invoices.length > 0) {
+                    msg += 'Kapanan/Düşülen Faturalar:\n';
+                    data.allocated_invoices.forEach(inv => {
+                        msg += '- ' + inv.invoice_id + ': ' + inv.amount + '\n';
+                    });
+                }
+                alert(msg);
+                location.reload();
+            })
+            .catch((error) => {
+                alert('Hata: ' + error.message);
+            });
+    }
+</script>
+
+{{ template "footer.html" . }}

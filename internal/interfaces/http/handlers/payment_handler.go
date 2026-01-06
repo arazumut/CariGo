@@ -10,10 +10,27 @@ import (
 
 type PaymentHandler struct {
 	registerPaymentUC *usecases.RegisterPaymentUseCase
+	listPaymentsUC    *usecases.ListPaymentsUseCase
 }
 
-func NewPaymentHandler(uc *usecases.RegisterPaymentUseCase) *PaymentHandler {
-	return &PaymentHandler{registerPaymentUC: uc}
+func NewPaymentHandler(registerUC *usecases.RegisterPaymentUseCase, listUC *usecases.ListPaymentsUseCase) *PaymentHandler {
+	return &PaymentHandler{
+		registerPaymentUC: registerUC,
+		listPaymentsUC:    listUC,
+	}
+}
+
+func (h *PaymentHandler) ShowPayments(c *gin.Context) {
+	payments, err := h.listPaymentsUC.Execute(c.Request.Context())
+	if err != nil {
+		payments = []dto.PaymentDTO{}
+	}
+
+	c.HTML(http.StatusOK, "payments.html", gin.H{
+		"Title":      "Ödemeler",
+		"ActivePage": "payments",
+		"Payments":   payments,
+	})
 }
 
 func (h *PaymentHandler) RegisterPayment(c *gin.Context) {

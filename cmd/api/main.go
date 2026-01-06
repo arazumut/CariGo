@@ -33,14 +33,19 @@ func main() {
 	// 3. Application (UseCases)
 	registerPaymentUC := usecases.NewRegisterPaymentUseCase(payRepo, invRepo, allocRepo, baseRepo, realClock)
 	createInvoiceUC := usecases.NewCreateInvoiceUseCase(invRepo, realClock)
+	listInvoicesUC := usecases.NewListInvoicesUseCase(invRepo)
+	listPaymentsUC := usecases.NewListPaymentsUseCase(payRepo)
 	dashboardStatsUC := usecases.NewGetDashboardStatsUseCase(payRepo, invRepo)
 
 	// 4. Interfaces (HTTP)
-	paymentHandler := handlers.NewPaymentHandler(registerPaymentUC)
-	invoiceHandler := handlers.NewInvoiceHandler(createInvoiceUC)
+	paymentHandler := handlers.NewPaymentHandler(registerPaymentUC, listPaymentsUC)
+	invoiceHandler := handlers.NewInvoiceHandler(createInvoiceUC, listInvoicesUC)
 	dashboardHandler := handlers.NewDashboardHandler(dashboardStatsUC)
 
 	r := gin.Default()
+	// Fix [GIN-debug] You trusted all proxies.
+	// For MVP/Local, we trust no one or localhost.
+	r.SetTrustedProxies(nil)
 
 	// Static Files & Templates
 	r.Static("/assets", "./web/assets")
@@ -55,6 +60,8 @@ func main() {
 
 	// UI Routes
 	r.GET("/", dashboardHandler.ShowDashboard)
+	r.GET("/invoices", invoiceHandler.ShowInvoices)
+	r.GET("/payments", paymentHandler.ShowPayments)
 
 	// API Routes
 	api := r.Group("/api/v1")

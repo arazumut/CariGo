@@ -1,0 +1,144 @@
+{{ template "header.html" . }}
+
+<div class="block-header">
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <h2>Faturalar</h2>
+            <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/"><i class="fa fa-dashboard"></i></a></li>
+                <li class="breadcrumb-item active">Faturalar</li>
+            </ul>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <div class="d-flex flex-row-reverse">
+                <div class="page_action">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addInvoiceModal"><i
+                            class="fa fa-plus"></i> Yeni Fatura</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row clearfix">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="header">
+                <h2>Fatura Listesi</h2>
+            </div>
+            <div class="body">
+                <div class="table-responsive">
+                    <table class="table table-hover js-basic-example dataTable table-custom">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Fatura ID</th>
+                                <th>Müşteri ID</th>
+                                <th>Tutar</th>
+                                <th>Tahsil Edilen</th>
+                                <th>Vade Tarihi</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{ range .Invoices }}
+                            <tr>
+                                <td>{{ .ID }}</td>
+                                <td>{{ .CustomerID }}</td>
+                                <td>{{ .TotalAmount }} {{ .Currency }}</td>
+                                <td>{{ .PaidAmount }} {{ .Currency }}</td>
+                                <td>{{ .DueDate }}</td>
+                                <td>
+                                    {{ if eq .Status "OPEN" }}<span class="badge badge-warning">Açık</span>
+                                    {{ else if eq .Status "PAID" }}<span class="badge badge-success">Ödendi</span>
+                                    {{ else if eq .Status "PARTIAL" }}<span class="badge badge-info">Kısmi</span>
+                                    {{ else }}<span class="badge badge-default">{{ .Status }}</span>{{ end }}
+                                </td>
+                            </tr>
+                            {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Invoice Modal -->
+<div class="modal fade" id="addInvoiceModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="title" id="defaultModalLabel">Yeni Fatura Oluştur</h4>
+            </div>
+            <div class="modal-body">
+                <form id="createInvoiceForm">
+                    <div class="form-group">
+                        <label>Müşteri ID</label>
+                        <input type="text" class="form-control" name="customer_id" required value="CUST-001">
+                    </div>
+                    <div class="form-group">
+                        <label>Tutar (Tam Sayı Kuruş)</label>
+                        <input type="number" class="form-control" name="amount" required
+                            placeholder="örn: 10000 (100.00 TL)">
+                    </div>
+                    <div class="form-group">
+                        <label>Para Birimi</label>
+                        <select class="form-control" name="currency">
+                            <option value="TRY">TRY</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Vade Tarihi</label>
+                        <input type="date" class="form-control" name="due_date" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="submitInvoice()">Kaydet</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function submitInvoice() {
+        const form = document.getElementById('createInvoiceForm');
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+            if (key === 'amount') {
+                data[key] = parseInt(value);
+            } else if (key === 'due_date') {
+                data[key] = new Date(value).toISOString();
+            } else {
+                data[key] = value;
+            }
+        });
+
+        fetch('/api/v1/invoices', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error) });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Fatura oluşturuldu!');
+                location.reload();
+            })
+            .catch((error) => {
+                alert('Hata: ' + error.message);
+            });
+    }
+</script>
+
+{{ template "footer.html" . }}
