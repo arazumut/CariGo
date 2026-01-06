@@ -1,0 +1,125 @@
+{{ template "header.html" . }}
+
+<div class="block-header">
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <h2>Müşteriler</h2>
+            <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/"><i class="fa fa-dashboard"></i></a></li>
+                <li class="breadcrumb-item active">Müşteri Listesi</li>
+            </ul>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <div class="d-flex flex-row-reverse">
+                <div class="page_action">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addCustomerModal"><i
+                            class="fa fa-plus"></i> Yeni Müşteri</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row clearfix">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="header">
+                <h2>Cari Hesaplar</h2>
+            </div>
+            <div class="body">
+                <div class="table-responsive">
+                    <table class="table table-hover js-basic-example dataTable table-custom">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Cari ID</th>
+                                <th>Ünvan / İsim</th>
+                                <th>Email</th>
+                                <th>Vergi/TC No</th>
+                                <th>Oluşturulma Tarihi</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{ range .Customers }}
+                            <tr>
+                                <td><strong>{{ .ID }}</strong></td>
+                                <td>{{ .Name }}</td>
+                                <td>{{ .Email }}</td>
+                                <td>{{ .TaxID }}</td>
+                                <td>{{ .CreatedAt }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-secondary" title="Detay (Sıradaki Özellik)"><i
+                                            class="fa fa-eye"></i> Ekstre</button>
+                                </td>
+                            </tr>
+                            {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Customer Modal -->
+<div class="modal fade" id="addCustomerModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="title" id="defaultModalLabel">Yeni Müşteri Ekle</h4>
+            </div>
+            <div class="modal-body">
+                <form id="createCustomerForm">
+                    <div class="form-group">
+                        <label>Cari Ünvan / İsim</label>
+                        <input type="text" class="form-control" name="name" required
+                            placeholder="Örn: ABC Lojistik A.Ş.">
+                    </div>
+                    <div class="form-group">
+                        <label>E-posta Adresi</label>
+                        <input type="email" class="form-control" name="email" required placeholder="muhasebe@abc.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Vergi / TC Kimlik No</label>
+                        <input type="text" class="form-control" name="tax_id" required placeholder="1234567890">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="submitCustomer()">Kaydet</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function submitCustomer() {
+        const form = document.getElementById('createCustomerForm');
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        fetch('/api/v1/customers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error) });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Müşteri başarıyla oluşturuldu: ' + data.name);
+                location.reload();
+            })
+            .catch((error) => {
+                alert('Hata: ' + error.message);
+            });
+    }
+</script>
+
+{{ template "footer.html" . }}

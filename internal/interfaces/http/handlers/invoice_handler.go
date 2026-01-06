@@ -11,28 +11,34 @@ import (
 type InvoiceHandler struct {
 	createInvoiceUC *usecases.CreateInvoiceUseCase
 	listInvoicesUC  *usecases.ListInvoicesUseCase
+	listCustomersUC *usecases.ListCustomersUseCase
 }
 
-func NewInvoiceHandler(createUC *usecases.CreateInvoiceUseCase, listUC *usecases.ListInvoicesUseCase) *InvoiceHandler {
+func NewInvoiceHandler(createUC *usecases.CreateInvoiceUseCase, listUC *usecases.ListInvoicesUseCase, listCustUC *usecases.ListCustomersUseCase) *InvoiceHandler {
 	return &InvoiceHandler{
 		createInvoiceUC: createUC,
 		listInvoicesUC:  listUC,
+		listCustomersUC: listCustUC,
 	}
 }
 
 func (h *InvoiceHandler) ShowInvoices(c *gin.Context) {
 	invoices, err := h.listInvoicesUC.Execute(c.Request.Context())
 	if err != nil {
-		// MVP: Log error, return empty list or error page.
-		// For now, let's return error page or just empty list with error flash check?
-		// We'll just return HTML with empty list and maybe an alert if we had one.
 		invoices = []dto.InvoiceDTO{}
+	}
+	
+	// Fetch customers for the dropdown
+	customers, err := h.listCustomersUC.Execute(c.Request.Context())
+	if err != nil {
+		customers = []dto.CustomerDTO{}
 	}
 
 	c.HTML(http.StatusOK, "invoices.html", gin.H{
 		"Title":      "Faturalar",
 		"ActivePage": "invoices",
 		"Invoices":   invoices,
+		"Customers":  customers,
 	})
 }
 

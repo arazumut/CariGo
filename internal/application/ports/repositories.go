@@ -27,6 +27,7 @@ type PaymentRepository interface {
 type CustomerRepository interface {
 	Save(ctx context.Context, customer *domain.Customer) error
 	FindByID(ctx context.Context, id domain.CustomerID) (*domain.Customer, error)
+	FindAll(ctx context.Context) ([]*domain.Customer, error)
 }
 
 // AllocationRepository defines access to Allocation storage.

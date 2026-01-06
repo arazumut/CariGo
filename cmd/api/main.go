@@ -23,7 +23,7 @@ func main() {
 	}
 
 	// 2. Infrastrucure
-	baseRepo, _, invRepo, payRepo, allocRepo, err := sqlite.NewRepositories(dbPath)
+	baseRepo, custRepo, invRepo, payRepo, allocRepo, err := sqlite.NewRepositories(dbPath)
 	if err != nil {
 		log.Fatalf("Failed to init DB: %v", err)
 	}
@@ -36,11 +36,16 @@ func main() {
 	listInvoicesUC := usecases.NewListInvoicesUseCase(invRepo)
 	listPaymentsUC := usecases.NewListPaymentsUseCase(payRepo)
 	dashboardStatsUC := usecases.NewGetDashboardStatsUseCase(payRepo, invRepo)
+	
+	// Customer UseCases
+	createCustomerUC := usecases.NewCreateCustomerUseCase(custRepo)
+	listCustomersUC := usecases.NewListCustomersUseCase(custRepo)
 
 	// 4. Interfaces (HTTP)
-	paymentHandler := handlers.NewPaymentHandler(registerPaymentUC, listPaymentsUC)
-	invoiceHandler := handlers.NewInvoiceHandler(createInvoiceUC, listInvoicesUC)
+	paymentHandler := handlers.NewPaymentHandler(registerPaymentUC, listPaymentsUC, listCustomersUC)
+	invoiceHandler := handlers.NewInvoiceHandler(createInvoiceUC, listInvoicesUC, listCustomersUC)
 	dashboardHandler := handlers.NewDashboardHandler(dashboardStatsUC)
+	customerHandler := handlers.NewCustomerHandler(createCustomerUC, listCustomersUC)
 
 	r := gin.Default()
 	// Fix [GIN-debug] You trusted all proxies.
@@ -62,12 +67,14 @@ func main() {
 	r.GET("/", dashboardHandler.ShowDashboard)
 	r.GET("/invoices", invoiceHandler.ShowInvoices)
 	r.GET("/payments", paymentHandler.ShowPayments)
+	r.GET("/customers", customerHandler.ShowCustomers)
 
 	// API Routes
 	api := r.Group("/api/v1")
 	{
 		api.POST("/invoices", invoiceHandler.CreateInvoice)
 		api.POST("/payments", paymentHandler.RegisterPayment)
+		api.POST("/customers", customerHandler.CreateCustomer)
 	}
 
 	// --------------------------------------------------------------------------------

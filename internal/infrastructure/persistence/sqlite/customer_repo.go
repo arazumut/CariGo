@@ -46,4 +46,23 @@ func (a *CustomerAdapter) FindByID(ctx context.Context, id domain.CustomerID) (*
 	return a.repo.FindCustomerByID(ctx, id)
 }
 
+func (a *CustomerAdapter) FindAll(ctx context.Context) ([]*domain.Customer, error) {
+	var models []CustomerModel
+	if err := a.repo.getDB(ctx).Find(&models).Error; err != nil {
+		return nil, err
+	}
+	var customers []*domain.Customer
+	for _, m := range models {
+		c, err := domain.NewCustomer(domain.CustomerID(m.ID), m.Name, m.Email, m.TaxID)
+		if err != nil {
+			return nil, err // data integrity issue or validation fail
+		}
+		// Manually setting timestamps as NewCustomer sets them to Now()
+		c.CreatedAt = parseTime(m.CreatedAt)
+		
+		customers = append(customers, c)
+	}
+	return customers, nil
+}
+
 var _ ports.CustomerRepository = &CustomerAdapter{}
