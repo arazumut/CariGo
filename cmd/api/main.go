@@ -40,12 +40,13 @@ func main() {
 	// Customer UseCases
 	createCustomerUC := usecases.NewCreateCustomerUseCase(custRepo)
 	listCustomersUC := usecases.NewListCustomersUseCase(custRepo)
+	getCustomerStatementUC := usecases.NewGetCustomerStatementUseCase(custRepo, invRepo, payRepo)
 
 	// 4. Interfaces (HTTP)
 	paymentHandler := handlers.NewPaymentHandler(registerPaymentUC, listPaymentsUC, listCustomersUC)
 	invoiceHandler := handlers.NewInvoiceHandler(createInvoiceUC, listInvoicesUC, listCustomersUC)
 	dashboardHandler := handlers.NewDashboardHandler(dashboardStatsUC)
-	customerHandler := handlers.NewCustomerHandler(createCustomerUC, listCustomersUC)
+	customerHandler := handlers.NewCustomerHandler(createCustomerUC, listCustomersUC, getCustomerStatementUC)
 
 	r := gin.Default()
 	// Fix [GIN-debug] You trusted all proxies.
@@ -68,6 +69,7 @@ func main() {
 	r.GET("/invoices", invoiceHandler.ShowInvoices)
 	r.GET("/payments", paymentHandler.ShowPayments)
 	r.GET("/customers", customerHandler.ShowCustomers)
+	r.GET("/customers/:id", customerHandler.ShowCustomerStatement)
 
 	// API Routes
 	api := r.Group("/api/v1")

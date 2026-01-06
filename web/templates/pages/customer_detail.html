@@ -1,0 +1,109 @@
+{{ template "header.html" . }}
+
+<div class="block-header">
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <h2>Cari Ekstre</h2>
+            <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/"><i class="fa fa-dashboard"></i></a></li>
+                <li class="breadcrumb-item"><a href="/customers">Müşteriler</a></li>
+                <li class="breadcrumb-item active">{{ .Statement.Customer.Name }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row clearfix">
+    <!-- Customer Info Card -->
+    <div class="col-lg-4 col-md-12">
+        <div class="card member-card">
+            <div class="header l-coral">
+                <h4 class="m-t-10 text-light">{{ .Statement.Customer.Name }}</h4>
+            </div>
+            <div class="member-img">
+                <a href="javascript:void(0);" class="">
+                    <img src="/assets/images/user.png" class="rounded-circle" alt="profile-image">
+                </a>
+            </div>
+            <div class="body">
+                <div class="col-12">
+                    <ul class="list-unstyled text-left">
+                        <li><strong>Cari ID:</strong> {{ .Statement.Customer.ID }}</li>
+                        <li><strong>Email:</strong> {{ .Statement.Customer.Email }}</li>
+                        <li><strong>Vergi No:</strong> {{ .Statement.Customer.TaxID }}</li>
+                    </ul>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <h5>Güncel Bakiye</h5>
+                        <h3
+                            class="m-b-0 {{ if gt .Statement.FinalBalance 0.0 }}text-danger{{ else }}text-success{{ end }}">
+                            {{ printf "%.2f" .Statement.FinalBalance }} ₺
+                        </h3>
+                        <small>{{ if gt .Statement.FinalBalance 0.0 }}Borçlu (Bize Ödemesi Gereken){{ else }}Alacaklı{{
+                            end }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statement Table -->
+    <div class="col-lg-8 col-md-12">
+        <div class="card">
+            <div class="header">
+                <h2>Hesap Hareketleri</h2>
+            </div>
+            <div class="body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-custom spacing5">
+                        <thead>
+                            <tr>
+                                <th>Tarih</th>
+                                <th>İşlem</th>
+                                <th>Açıklama</th>
+                                <th class="text-right">Borç</th>
+                                <th class="text-right">Alacak</th>
+                                <th class="text-right">Bakiye</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{ range .Statement.Transactions }}
+                            <tr>
+                                <td>{{ .Date.Format "02.01.2006" }}</td>
+                                <td>
+                                    {{ if eq .Type "FATURA" }}
+                                    <span class="badge badge-warning">FATURA</span>
+                                    {{ else }}
+                                    <span class="badge badge-success">TAHSİLAT</span>
+                                    {{ end }}
+                                </td>
+                                <td>
+                                    {{ .Description }}
+                                    <div class="text-muted font-10">{{ .ReferenceID }}</div>
+                                </td>
+                                <td class="text-right">
+                                    {{ if gt .Debt 0.0 }}
+                                    {{ printf "%.2f" .Debt }} ₺
+                                    {{ else }}-{{ end }}
+                                </td>
+                                <td class="text-right">
+                                    {{ if gt .Credit 0.0 }}
+                                    {{ printf "%.2f" .Credit }} ₺
+                                    {{ else }}-{{ end }}
+                                </td>
+                                <td class="text-right font-weight-bold">
+                                    {{ printf "%.2f" .Balance }} ₺
+                                </td>
+                            </tr>
+                            {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ template "footer.html" . }}

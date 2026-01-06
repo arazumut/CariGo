@@ -48,8 +48,8 @@
                                 <td>{{ .TaxID }}</td>
                                 <td>{{ .CreatedAt }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-secondary" title="Detay (Sıradaki Özellik)"><i
-                                            class="fa fa-eye"></i> Ekstre</button>
+                                    <a href="/customers/{{ .ID }}" class="btn btn-sm btn-outline-secondary"
+                                        title="Hesap Ekstresi"><i class="fa fa-eye"></i> Ekstre</a>
                                 </td>
                             </tr>
                             {{ end }}

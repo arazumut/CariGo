@@ -68,6 +68,30 @@ func (a *PaymentAdapter) FindAll(ctx context.Context) ([]*domain.Payment, error)
 	return payments, nil
 }
 
+func (a *PaymentAdapter) FindByCustomer(ctx context.Context, cid domain.CustomerID) ([]*domain.Payment, error) {
+	var models []PaymentModel
+	err := a.repo.getDB(ctx).
+		Where("customer_id = ?", string(cid)).
+		Order("date asc"). // Chronological
+		Find(&models).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var payments []*domain.Payment
+	for _, m := range models {
+		amount, _ := domain.NewMoney(m.Amount, m.Currency)
+		p := domain.NewPayment(domain.PaymentID(m.ID), domain.CustomerID(m.CustomerID), amount, parseTime(m.Date))
+		
+		avail, _ := domain.NewMoney(m.AvailableAmount, m.Currency)
+		p.AvailableAmount = avail
+		p.CreatedAt = parseTime(m.CreatedAt)
+		
+		payments = append(payments, p)
+	}
+	return payments, nil
+}
+
 func (a *PaymentAdapter) SumTotalCollected(ctx context.Context) (int64, error) {
 	var total int64
 	// Sum the initial amounts of all payments

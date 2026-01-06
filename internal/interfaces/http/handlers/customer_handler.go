@@ -11,12 +11,14 @@ import (
 type CustomerHandler struct {
 	createCustomerUC *usecases.CreateCustomerUseCase
 	listCustomersUC  *usecases.ListCustomersUseCase
+	getStatementUC   *usecases.GetCustomerStatementUseCase
 }
 
-func NewCustomerHandler(create *usecases.CreateCustomerUseCase, list *usecases.ListCustomersUseCase) *CustomerHandler {
+func NewCustomerHandler(create *usecases.CreateCustomerUseCase, list *usecases.ListCustomersUseCase, statement *usecases.GetCustomerStatementUseCase) *CustomerHandler {
 	return &CustomerHandler{
 		createCustomerUC: create,
 		listCustomersUC:  list,
+		getStatementUC:   statement,
 	}
 }
 
@@ -47,4 +49,25 @@ func (h *CustomerHandler) CreateCustomer(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, res)
+}
+
+func (h *CustomerHandler) ShowCustomerStatement(c *gin.Context) {
+	customerID := c.Param("id")
+	if customerID == "" {
+		c.Redirect(http.StatusFound, "/customers")
+		return
+	}
+
+	statement, err := h.getStatementUC.Execute(c.Request.Context(), customerID)
+	if err != nil {
+		// Log error and redirect or show error page
+		c.Redirect(http.StatusFound, "/customers")
+		return
+	}
+
+	c.HTML(http.StatusOK, "customer_detail.html", gin.H{
+		"Title":      "Cari Ekstre",
+		"ActivePage": "customers",
+		"Statement":  statement,
+	})
 }

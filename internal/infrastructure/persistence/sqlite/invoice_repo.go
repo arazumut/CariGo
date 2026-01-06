@@ -86,6 +86,27 @@ func (a *InvoiceAdapter) FindAll(ctx context.Context) ([]*domain.Invoice, error)
 	return invoices, nil
 }
 
+func (a *InvoiceAdapter) FindByCustomer(ctx context.Context, cid domain.CustomerID) ([]*domain.Invoice, error) {
+	var models []InvoiceModel
+	err := a.repo.getDB(ctx).
+		Where("customer_id = ?", string(cid)).
+		Order("created_at asc").
+		Find(&models).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var invoices []*domain.Invoice
+	for _, m := range models {
+		inv, err := a.mapToDomain(m)
+		if err != nil {
+			return nil, err
+		}
+		invoices = append(invoices, inv)
+	}
+	return invoices, nil
+}
+
 func (a *InvoiceAdapter) mapToDomain(m InvoiceModel) (*domain.Invoice, error) {
 	total, err := domain.NewMoney(m.TotalAmount, m.Currency)
 	if err != nil {
