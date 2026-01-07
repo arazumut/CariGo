@@ -25,19 +25,15 @@ func NewGetCustomerStatementUseCase(c ports.CustomerRepository, i ports.InvoiceR
 func (uc *GetCustomerStatementUseCase) Execute(ctx context.Context, customerID string) (*dto.CustomerStatementDTO, error) {
 	cid := domain.CustomerID(customerID)
 	
-	// 1. Get Customer
 	customer, err := uc.custRepo.FindByID(ctx, cid)
 	if err != nil {
 		return nil, err
 	}
-
-	// 2. Get Invoices
 	invoices, err := uc.invRepo.FindByCustomer(ctx, cid)
 	if err != nil {
 		return nil, err
 	}
 
-	// 3. Get Payments
 	payments, err := uc.payRepo.FindByCustomer(ctx, cid)
 	if err != nil {
 		return nil, err

@@ -18,7 +18,6 @@ func NewCreateCustomerUseCase(repo ports.CustomerRepository) *CreateCustomerUseC
 }
 
 func (uc *CreateCustomerUseCase) Execute(ctx context.Context, req dto.CreateCustomerRequest) (*dto.CreateCustomerResponse, error) {
-	// Generate simple ID like "CUST-TIMESTAMP"
 	id := domain.CustomerID(fmt.Sprintf("CUST-%d", time.Now().UnixNano()))
 	
 	customer, err := domain.NewCustomer(id, req.Name, req.Email, req.TaxID)
