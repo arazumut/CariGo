@@ -60,7 +60,6 @@ func (h *CustomerHandler) ShowCustomerStatement(c *gin.Context) {
 
 	statement, err := h.getStatementUC.Execute(c.Request.Context(), customerID)
 	if err != nil {
-		// Log error and redirect or show error page
 		c.Redirect(http.StatusFound, "/customers")
 		return
 	}

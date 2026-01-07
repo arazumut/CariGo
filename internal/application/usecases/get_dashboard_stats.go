@@ -8,9 +8,9 @@ import (
 type DashboardStats struct {
 	TotalCollected int64
 	OpenInvoices   int64
-	TotalRevenue   int64 // Toplam Ciro (Kesilen Faturalar)
-	TotalCustomers int64 // Müşteri Sayısı
-	PendingBalance int64 // Bekleyen Alacak (TotalRevenue - TotalCollected kabaca veya (TotalAmount - PaidAmount))
+	TotalRevenue   int64 
+	TotalCustomers int64 
+	PendingBalance int64 
 }
 
 type GetDashboardStatsUseCase struct {
@@ -24,37 +24,28 @@ func NewGetDashboardStatsUseCase(pr ports.PaymentRepository, ir ports.InvoiceRep
 }
 
 func (uc *GetDashboardStatsUseCase) Execute(ctx context.Context) (*DashboardStats, error) {
-	// 1. Total Collected
 	totalCollected, err := uc.payRepo.SumTotalCollected(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	// 2. Count Open Invoices
 	openInvoices, err := uc.invRepo.CountAllOpen(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// 3. Total Revenue (Total Invoiced Amount)
 	totalRevenue, err := uc.invRepo.SumTotalAmount(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// 4. Total Customers
 	totalCustomers, err := uc.custRepo.Count(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// 5. Pending Balance (Basitçe Ciro - Tahsilat demek doğru olmaz, çünkü açık faturaların toplam kalan tutarı daha doğrudur)
-	// Ancak şimdilik PRATİK olsun diye: Toplam Kesilen - Toplam Tahsilat = Piyasada Kalan Para diyebiliriz (kabaca)
-	// Veya daha doğrusu Open Invoices toplamını çekmek olurdu ama repo methodu yok.
-	// Şimdilik: TotalRevenue - TotalCollected
 	pendingBalance := totalRevenue - totalCollected
 	if pendingBalance < 0 {
-		pendingBalance = 0 // Overpayment situation
+		pendingBalance = 0 
 	}
 
 	return &DashboardStats{

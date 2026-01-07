@@ -20,8 +20,6 @@ type InvoiceModel struct {
 	UpdatedAt   int64
 }
 
-// --- Invoice Repo ---
-
 func (r *GormRepository) SaveInvoice(ctx context.Context, i *domain.Invoice) error {
 	m := InvoiceModel{
 		ID:          string(i.ID),
@@ -48,7 +46,6 @@ func (a *InvoiceAdapter) FindByID(ctx context.Context, id domain.InvoiceID) (*do
 } 
 func (a *InvoiceAdapter) FindOpenByCustomer(ctx context.Context, cid domain.CustomerID) ([]*domain.Invoice, error) {
 	var models []InvoiceModel
-	// Find invoices where status is OPEN or PARTIAL, ordered by DueDate ASC (FIFO)
 	err := a.repo.getDB(ctx).
 		Where("customer_id = ? AND status IN ?", string(cid), []string{string(domain.InvoiceStatusOpen), string(domain.InvoiceStatusPartial)}).
 		Order("due_date asc").

@@ -35,10 +35,8 @@ func (uc *ListInvoicesUseCase) Execute(ctx context.Context) ([]dto.InvoiceDTO, e
 			DueDate:     inv.DueDate.Format("2006-01-02"),
 		}
 		
-		// Optional: If status is Open but due date passed, maybe UI wants to know?
-		// Keeping it simple for now.
 		if inv.Status == domain.InvoiceStatusOpen && inv.DueDate.Before(time.Now()) {
-			// Could mark as "Overdue" in UI logic
+			
 		}
 	}
 	return dtos, nil

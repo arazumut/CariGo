@@ -2,16 +2,14 @@ package dto
 
 import "time"
 
-// RegisterPaymentRequest carries data to register a new payment.
 type RegisterPaymentRequest struct {
 	CustomerID string  `json:"customer_id" binding:"required"`
-	Amount     int64   `json:"amount" binding:"required,gt=0"` // Cents
+	Amount     int64   `json:"amount" binding:"required,gt=0"`
 	Currency   string  `json:"currency" binding:"required,len=3"`
-	Date       time.Time `json:"date"` // Optional, defaults to now
+	Date       time.Time `json:"date"`
 	Notes      string  `json:"notes"`
 }
 
-// RegisterPaymentResponse is the result of the operation.
 type RegisterPaymentResponse struct {
 	PaymentID         string `json:"payment_id"`
 	AllocatedAmount   int64  `json:"allocated_amount"`

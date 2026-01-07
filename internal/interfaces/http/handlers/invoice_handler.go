@@ -28,7 +28,6 @@ func (h *InvoiceHandler) ShowInvoices(c *gin.Context) {
 		invoices = []dto.InvoiceDTO{}
 	}
 	
-	// Fetch customers for the dropdown
 	customers, err := h.listCustomersUC.Execute(c.Request.Context())
 	if err != nil {
 		customers = []dto.CustomerDTO{}

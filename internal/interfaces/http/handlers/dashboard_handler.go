@@ -18,17 +18,9 @@ func NewDashboardHandler(uc *usecases.GetDashboardStatsUseCase) *DashboardHandle
 func (h *DashboardHandler) ShowDashboard(c *gin.Context) {
 	stats, err := h.statsUC.Execute(c.Request.Context())
 	if err != nil {
-		// In production, you might show an error page or log it.
-		// For now, we continue with zero values or handle gracefully
-		// Since ShowDashboard is a page load, we should probably still render, maybe with an error flash.
-		// Let's assume zero stats on error for MVP stability.
 		stats = &usecases.DashboardStats{}
 	}
 
-	// Helper to format cents to currency string (very basic)
-    // In template or here. Let's send raw cents and let template logic or simple division handle it if possible.
-	// Or format here.
-	// Or format here.
 	formattedTotal := float64(stats.TotalCollected) / 100.0
 	formattedRevenue := float64(stats.TotalRevenue) / 100.0
 	formattedPending := float64(stats.PendingBalance) / 100.0

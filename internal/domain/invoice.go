@@ -15,13 +15,11 @@ const (
 
 type InvoiceID string
 
-// Invoice is the core entity.
-// It holds the state of debt.
 type Invoice struct {
 	ID          InvoiceID
 	CustomerID  CustomerID
 	TotalAmount Money
-	PaidAmount  Money // Amount already paid/allocated
+	PaidAmount  Money
 	IssueDate   time.Time
 	DueDate     time.Time
 	Status      InvoiceStatus
@@ -29,7 +27,6 @@ type Invoice struct {
 	UpdatedAt   time.Time
 }
 
-// NewInvoice creates a fresh invoice in OPEN state.
 func NewInvoice(id InvoiceID, customerID CustomerID, total Money, issueDate, dueDate time.Time) (*Invoice, error) {
 	if total.IsZero() || total.amount < 0 {
 		return nil, ErrNegativeAmount
@@ -50,14 +47,11 @@ func NewInvoice(id InvoiceID, customerID CustomerID, total Money, issueDate, due
 	}, nil
 }
 
-// RemainingAmount calculates how much is left to pay.
 func (i *Invoice) RemainingAmount() Money {
 	remaining, _ := i.TotalAmount.Subtract(i.PaidAmount)
 	return remaining
 }
 
-// AllocatePayment attempts to apply a payment amount to this invoice.
-// It updates the status automatically.
 func (i *Invoice) AllocatePayment(amount Money) error {
 	if i.Status == InvoiceStatusPaid || i.Status == InvoiceStatusVoid {
 		return ErrInvoiceAlreadyPaid
@@ -68,15 +62,6 @@ func (i *Invoice) AllocatePayment(amount Money) error {
 	}
 
 	remaining := i.RemainingAmount()
-	
-	// Check for overpayment attempts if strict
-	// For now, we allow full allocation logic to handle logic, but Entity should define boundaries.
-	// If allocation amount > remaining, we should probably error here or cap it?
-	// The business rule says: "Overpayment support". 
-	// However, usually an Invoice entity itself shouldn't store more PaidAmount than Total.
-	// Any excess should be handled by the Service/UseCase as "Account Credit".
-	// So strictly, Invoice accepts up to Remaining.
-	
 	isOverpayment, _ := amount.GreaterThan(remaining)
 	if isOverpayment {
 		return ErrOverPaymentNotAllowed

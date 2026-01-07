@@ -5,13 +5,11 @@ import (
 )
 
 type PaymentID string
-
-// Payment represents a money transfer from a customer.
 type Payment struct {
 	ID              PaymentID
 	CustomerID      CustomerID
 	Amount          Money
-	AvailableAmount Money // Amount not yet allocated to invoices
+	AvailableAmount Money
 	Date            time.Time
 	Notes           string
 	CreatedAt       time.Time
@@ -22,19 +20,16 @@ func NewPayment(id PaymentID, customerID CustomerID, amount Money, date time.Tim
 		ID:              id,
 		CustomerID:      customerID,
 		Amount:          amount,
-		AvailableAmount: amount, // Initially all available
+		AvailableAmount: amount,
 		Date:            date,
 		CreatedAt:       time.Now(),
 	}
 }
 
-// UseFunds deducts from AvailableAmount.
 func (p *Payment) UseFunds(amount Money) error {
 	if amount.currency != p.AvailableAmount.currency {
 		return ErrCurrencyMismatch
 	}
-
-	// Check if enough funds
 	greater, _ := amount.GreaterThan(p.AvailableAmount)
 	if greater {
 		return ErrInsufficientPaymentBalance

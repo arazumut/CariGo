@@ -15,8 +15,6 @@ type CustomerModel struct {
 	UpdatedAt int64
 }
 
-// --- Customer Repo ---
-
 func (r *GormRepository) SaveCustomer(ctx context.Context, c *domain.Customer) error {
 	m := CustomerModel{
 		ID:        string(c.ID),
@@ -55,9 +53,8 @@ func (a *CustomerAdapter) FindAll(ctx context.Context) ([]*domain.Customer, erro
 	for _, m := range models {
 		c, err := domain.NewCustomer(domain.CustomerID(m.ID), m.Name, m.Email, m.TaxID)
 		if err != nil {
-			return nil, err // data integrity issue or validation fail
+			return nil, err
 		}
-		// Manually setting timestamps as NewCustomer sets them to Now()
 		c.CreatedAt = parseTime(m.CreatedAt)
 		
 		customers = append(customers, c)

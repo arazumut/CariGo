@@ -5,10 +5,7 @@ import (
 	"time"
 )
 
-// CustomerID identifies a customer unique.
 type CustomerID string
-
-// Customer represents the entity that owes money.
 type Customer struct {
 	ID        CustomerID
 	Name      string
@@ -18,8 +15,6 @@ type Customer struct {
 	UpdatedAt time.Time
 }
 
-// NewCustomer creates a new customer.
-// Validation logic plays here.
 func NewCustomer(id CustomerID, name, email, taxID string) (*Customer, error) {
 	if id == "" {
 		return nil, errors.New("customer ID is required")

@@ -15,8 +15,6 @@ type AllocationModel struct {
 	CreatedAt int64
 }
 
-// --- Allocation Repo ---
-
 func (r *GormRepository) SaveAllocation(ctx context.Context, a *domain.Allocation) error {
 	m := AllocationModel{
 		ID:        string(a.ID),

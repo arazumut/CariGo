@@ -39,7 +39,6 @@ func (uc *GetCustomerStatementUseCase) Execute(ctx context.Context, customerID s
 		return nil, err
 	}
 
-	// 4. Merge and Sort
 	var transactions []dto.StatementItem
 
 	for _, inv := range invoices {
@@ -66,15 +65,12 @@ func (uc *GetCustomerStatementUseCase) Execute(ctx context.Context, customerID s
 		})
 	}
 
-	// Sort by Date
 	sort.Slice(transactions, func(i, j int) bool {
 		return transactions[i].Date.Before(transactions[j].Date)
 	})
 
-	// 5. Calculate Running Balance
 	balance := 0.0
 	for i := range transactions {
-		// Borç artırır, Alacak (Ödeme) düşürür
 		balance += transactions[i].Debt
 		balance -= transactions[i].Credit
 		transactions[i].Balance = balance
@@ -89,6 +85,6 @@ func (uc *GetCustomerStatementUseCase) Execute(ctx context.Context, customerID s
 		},
 		Transactions: transactions,
 		FinalBalance: balance,
-		Currency:     "TRY", // MVP assumption or derived from transactions
+		Currency:     "TRY",
 	}, nil
 }

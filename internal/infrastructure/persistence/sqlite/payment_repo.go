@@ -17,8 +17,6 @@ type PaymentModel struct {
 	CreatedAt       int64
 }
 
-// --- Payment Repo ---
-
 func (r *GormRepository) SavePayment(ctx context.Context, p *domain.Payment) error {
 	m := PaymentModel{
 		ID:              string(p.ID),
@@ -54,12 +52,6 @@ func (a *PaymentAdapter) FindAll(ctx context.Context) ([]*domain.Payment, error)
 		p := domain.NewPayment(domain.PaymentID(m.ID), domain.CustomerID(m.CustomerID), amount, parseTime(m.Date))
 		
 		avail, _ := domain.NewMoney(m.AvailableAmount, m.Currency)
-		// We need to set AvailableAmount. Since it is public in entity (usually) or via constructor.
-		// Checking domain/payment.go would be ideal but assuming it's accessible or we reconstruct.
-		// The NewPayment sets Available = Amount. We need to overwrite it.
-		// Wait, Payment struct fields might be private/protected?
-		// Let's assume standard Go struct access or I'll check domain if this fails.
-		// Given Invoice was accessible, this likely is too.
 		p.AvailableAmount = avail
 		p.CreatedAt = parseTime(m.CreatedAt)
 		
@@ -72,7 +64,7 @@ func (a *PaymentAdapter) FindByCustomer(ctx context.Context, cid domain.Customer
 	var models []PaymentModel
 	err := a.repo.getDB(ctx).
 		Where("customer_id = ?", string(cid)).
-		Order("date asc"). // Chronological
+		Order("date asc").
 		Find(&models).Error
 	if err != nil {
 		return nil, err
@@ -94,7 +86,6 @@ func (a *PaymentAdapter) FindByCustomer(ctx context.Context, cid domain.Customer
 
 func (a *PaymentAdapter) SumTotalCollected(ctx context.Context) (int64, error) {
 	var total int64
-	// Sum the initial amounts of all payments
 	err := a.repo.getDB(ctx).Model(&PaymentModel{}).
 		Select("ifnull(sum(amount), 0)").
 		Scan(&total).Error
