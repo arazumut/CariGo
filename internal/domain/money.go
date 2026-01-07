@@ -44,7 +44,6 @@ func (m Money) IsZero() bool {
 }
 
 func (m Money) GreaterThan(other Money) (bool, error) {
-func (m Money) GreaterThan(other Money) (bool, error) {
 	if m.currency != other.currency {
 		return false, ErrCurrencyMismatch
 	}
